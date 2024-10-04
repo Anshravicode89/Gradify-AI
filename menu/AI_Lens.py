@@ -1,29 +1,41 @@
-
-import streamlit as st 
-import google.generativeai as genai 
-import google.ai.generativelanguage as glm 
+import streamlit as st
+import google.generativeai as genai
+import google.ai.generativelanguage as glm
 from dotenv import load_dotenv
 from PIL import Image
-import os 
-import io 
+import os
+import io
 import json
-from streamlit_lottie import st_lottie 
-
+from streamlit_lottie import st_lottie
 
 load_dotenv()
 
 def image_to_byte_array(image: Image) -> bytes:
     imgByteArr = io.BytesIO()
     image.save(imgByteArr, format=image.format)
-    imgByteArr=imgByteArr.getvalue()
+    imgByteArr = imgByteArr.getvalue()
     return imgByteArr
 
 API_KEY = os.environ.get("GOOGLE_API_KEY")
 genai.configure(api_key=API_KEY)
 
 def main():
-  
-    
+    # Applying blue styling to the title and placeholder text
+    st.markdown(
+        """
+        <style>
+            h1 {
+                color: #3E76E0; /* Blue Color for the Title */
+            }
+            .prompt-placeholder input::placeholder {
+                color: #3E76E0; /* Placeholder Text Color */
+                font-style: italic;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     st.write("<h1><center>Virtual Assistant Interface</center></h1>", unsafe_allow_html=True)
     st.write("")
 
@@ -36,10 +48,14 @@ def main():
             animation = json.load(anim_source)
             st_lottie(animation, 1, True, True, "high", 200, -200)
 
+        # Applying the placeholder style class
+        st.markdown('<div class="prompt-placeholder">', unsafe_allow_html=True)
         prompt = st.text_input("prompt please...", placeholder="Prompt", label_visibility="visible")
+        st.markdown('</div>', unsafe_allow_html=True)
+
         model = genai.GenerativeModel("gemini-pro")
 
-        if st.button("SEND",use_container_width=True):
+        if st.button("SEND", use_container_width=True):
             response = model.generate_content(prompt)
 
             st.write("")
@@ -55,7 +71,11 @@ def main():
             animation = json.load(anim_source)
             st_lottie(animation, 1, True, True, "high", 200, -200)
 
+        # Placeholder style for the image upload prompt as well
+        st.markdown('<div class="prompt-placeholder">', unsafe_allow_html=True)
         image_prompt = st.text_input("Interact with the Image", placeholder="Prompt", label_visibility="visible")
+        st.markdown('</div>', unsafe_allow_html=True)
+
         uploaded_file = st.file_uploader("Choose and Image", accept_multiple_files=False, type=["png", "jpg", "jpeg", "img", "webp"])
 
         if uploaded_file is not None:
